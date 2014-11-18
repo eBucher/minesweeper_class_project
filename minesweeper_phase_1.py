@@ -152,65 +152,19 @@ def find_neighbor_count(game_board_markers, row, column):
     Checks to see how many mines are around a certain cell in a matrix,
     and returns that number. Mines can be diagonal, horizontal,
     or vertical.
+    Works by seeing if cells relative to the selected cell exist,
+    and then checks to see if they contain a mine.
+    Returns the number of mines relative to the cell.
     '''
     neighbor_count = 0
-    # Checks to see if it is the top left corner
-    if row == 0 and column == 0:
-        neighbor_count += is_mine(game_board_markers[row][column+1]) +\
-                          is_mine(game_board_markers[row+1][column+1]) +\
-                          is_mine(game_board_markers[row+1][column])
-    # Checks to see if it is the top right corner
-    elif row == 0 and column == len(game_board_markers[row]) - 1:
-        neighbor_count += is_mine(game_board_markers[row+1][column]) +\
-                          is_mine(game_board_markers[row+1][column-1]) +\
-                          is_mine(game_board_markers[row][column-1])
-    # Checks to see if it is the bottom left corner
-    elif row == len(game_board_markers) - 1 and column == 0:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row-1][column+1]) +\
-                          is_mine(game_board_markers[row][column+1])
-    # Checks to see if it is the bottom right corner
-    elif row == len(game_board_markers) - 1 and column == len(game_board_markers[row]) - 1:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row][column+-1]) +\
-                          is_mine(game_board_markers[row-1][column-1])
-    # Checks to see if it is in the top row but not a corner
-    elif row == 0:
-        neighbor_count += is_mine(game_board_markers[row][column+1]) +\
-                          is_mine(game_board_markers[row+1][column+1]) +\
-                          is_mine(game_board_markers[row+1][column]) +\
-                          is_mine(game_board_markers[row+1][column-1]) +\
-                          is_mine(game_board_markers[row][column-1])
-    # Checks to see if it is in the bottom row but not a corner
-    elif row == len(game_board_markers) -1:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row-1][column+1]) +\
-                          is_mine(game_board_markers[row][column+1]) +\
-                          is_mine(game_board_markers[row][column-1]) +\
-                          is_mine(game_board_markers[row-1][column-1])
-    # Checks to see if it is in the left-most column but not a corner
-    elif column == 0:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row-1][column+1]) +\
-                          is_mine(game_board_markers[row][column+1]) +\
-                          is_mine(game_board_markers[row+1][column+1]) +\
-                          is_mine(game_board_markers[row+1][column])
-    # Checks to see if it is in the right-most column but not a corner
-    elif column == len(game_board_markers[row]) - 1:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row+1][column]) +\
-                          is_mine(game_board_markers[row+1][column-1]) +\
-                          is_mine(game_board_markers[row][column-1]) +\
-                          is_mine(game_board_markers[row-1][column-1])
-    else:
-        neighbor_count += is_mine(game_board_markers[row-1][column]) +\
-                          is_mine(game_board_markers[row-1][column+1]) +\
-                          is_mine(game_board_markers[row][column+1]) +\
-                          is_mine(game_board_markers[row+1][column+1]) +\
-                          is_mine(game_board_markers[row+1][column]) +\
-                          is_mine(game_board_markers[row+1][column-1]) +\
-                          is_mine(game_board_markers[row][column-1]) +\
-                          is_mine(game_board_markers[row-1][column-1])
+    surrounding_coords = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1],
+                          [1,0],[1,1]]
+    for i in range(len(surrounding_coords)):
+        row_change = surrounding_coords[i][0]
+        column_change = surrounding_coords[i][1]
+        if 0 <= row + row_change <= len(game_board_markers) - 1 and\
+           0 <= column + column_change <= len(game_board_markers[row]) - 1:
+            neighbor_count += is_mine(game_board_markers[row + row_change][column + column_change])
     return neighbor_count
 
 
