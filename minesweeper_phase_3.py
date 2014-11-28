@@ -23,6 +23,7 @@ unflipped_no_neighbor = 0
 FLIPPED_SQUARE_ID = 10
 mine_id = 13
 
+
 def get_difficulty():
     '''
     Prompts the user for a level of difficulty
@@ -259,6 +260,21 @@ def get_square_clicked(game_board_markers, click_point):
         return None
 
 
+def was_new_cell_clicked(game_board_markers, click_point):
+    '''
+    Returns True if a new cell was clicked.
+    Otherwise, returns False if the click was out of the grid or
+    if the cell has already been clicked.
+    '''
+    row = (click_point.getY() - TOP_OFFSET) // HEIGHT_OF_IMAGES
+    column = (click_point.getX() - LEFT_OFFSET) // WIDTH_OF_IMAGES
+    if 0 <= row <= len(game_board_markers) -1 and\
+       0 <= column <= len(game_board_markers[0]) -1:
+        if game_board_markers[row][column] != EXPOSED_CELL:
+            return True
+    return False
+    
+
 def flip_tile(game_board_markers, click_point, tiles, row, column):
     '''
     Takes a mouse click and tries to flip over the tile that was clicked.
@@ -280,8 +296,13 @@ def flip_mines(game_board_markers, tiles):
 
 
 def uncover_adjacent_blank_cells(game_board_markers, tiles, row, column):
+    '''
+    Flips all of the blank cells that are adjacent to a specific cell.
+    Returns the number of adjacent cells flipped.
+    '''
     surrounding_coords = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1],
                           [1,0],[1,1]]
+    flipped_cells = 0
     for i in range(len(surrounding_coords)):
         row_change = surrounding_coords[i][0]
         column_change = surrounding_coords[i][1]
@@ -290,6 +311,8 @@ def uncover_adjacent_blank_cells(game_board_markers, tiles, row, column):
             if game_board_markers[row + row_change][column + column_change] == BLANK_CELL:
                 tiles[row + row_change][column + column_change].undraw()
                 game_board_markers[row + row_change][column + column_change] = EXPOSED_CELL
+                flipped_cells += 1
+    return flipped_cells
 
 def handle_click(game_board_markers, click_point, tiles):
     '''
@@ -298,20 +321,24 @@ def handle_click(game_board_markers, click_point, tiles):
     If the tile is a number cell, it will uncover the only that cell.
     If the tile is a blank cell, it will uncover that cell and any
     adjacent blank cells.
-    Returns True to indicate that a mine is clicked.
+    Returns True if a mine was clicked, otherwise the number of cells flipped is returned.
+    Note: 0 <= the number of cells flipped <= 9
     '''
+    flipped_cells = 0
     if get_square_clicked(game_board_markers, click_point) != None:
         row, column = get_square_clicked(game_board_markers, click_point)
         flip_tile(game_board_markers, click_point, tiles, row, column)
         clicked_cell_id = game_board_markers[row][column]
-        print(clicked_cell_id)
         if clicked_cell_id == MINE_CELL:
             flip_mines(game_board_markers, tiles)
-            return True
+            return 'mine'
         elif clicked_cell_id == BLANK_CELL:
-            uncover_adjacent_blank_cells(game_board_markers, tiles, row, column)
+            flipped_cells = 1
+            flipped_cells += uncover_adjacent_blank_cells(game_board_markers, tiles, row, column)
             game_board_markers[row][column] = EXPOSED_CELL
-    return False
+        elif 1 <= clicked_cell_id <= 8:
+            flipped_cells = 1
+        return flipped_cells
     
         
 
@@ -338,6 +365,10 @@ def draw_row_headers(game_board_markers, window):
         num.draw(window)
 
 
+def draw_game_message(window, window_width, message):
+    text = Text(Point(window_width / 2, TOP_OFFSET / 2), message)
+    text.setSize(16)
+    text.draw(window)
         
 def main():
     difficulty = get_difficulty()
@@ -364,10 +395,28 @@ def main():
     draw_row_headers(game_board_markers, window)
     tiles = draw_tiles(game_board_markers, window)
 
+    flipped_cells = 0
     
     #Here is where the game actually begins being played.
-    clicked_mine = False
-    while clicked_mine == False:
+    game_status = 'playing'
+    while game_status == 'playing':
         click_point = window.getMouse()
-        clicked_mine = handle_click(game_board_markers, click_point, tiles)
+        if was_new_cell_clicked(game_board_markers, click_point) == True:
+            print('we are in a new cell')
+            click_output = handle_click(game_board_markers, click_point, tiles)
+            if click_output == 'mine':
+                print('Clicked a mine')
+                game_status = 'lose'
+                draw_game_message(window, window_width, 'Game Over')
+            elif 0 <= click_output <= 9:
+                print('flipping a cell')
+                flipped_cells += click_output
+        if flipped_cells == rows * columns - number_of_mines:
+            game_status == 'win'
+            draw_game_message(window, window_width, 'Winner')
+
+        print(flipped_cells)
+
+        
+        
 main()
