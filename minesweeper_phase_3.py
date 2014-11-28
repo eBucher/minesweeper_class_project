@@ -19,10 +19,6 @@ BOTTOM_OFFSET = LEFT_OFFSET // 2
 X_OFFSET = LEFT_OFFSET
 Y_OFFSET = TOP_OFFSET
 
-unflipped_no_neighbor = 0
-FLIPPED_SQUARE_ID = 10
-mine_id = 13
-
 
 def get_difficulty():
     '''
@@ -134,7 +130,7 @@ def populate_with_mines(game_board_markers, number_of_mines, rows, columns):
                                                             mine_locations)
         row_id = new_mine_location[0]
         column_id = new_mine_location[1]
-        game_board_markers[row_id][column_id] = mine_id
+        game_board_markers[row_id][column_id] = MINE_CELL
         mine_locations.append(new_mine_location)
     return game_board_markers
 
@@ -143,7 +139,7 @@ def is_mine(value):
     Checks to see if two values are equal.
     Returns 1 if they are and 0 if they are not.
     '''
-    if value == mine_id:
+    if value == MINE_CELL:
         return 1
     else:
         return 0
@@ -179,7 +175,7 @@ def add_mine_counts(game_board_markers):
     '''
     for row in range(len(game_board_markers)):
         for column in range(len(game_board_markers[row])):
-            if game_board_markers[row][column] != mine_id:
+            if game_board_markers[row][column] != MINE_CELL:
                 neighbor_mine_count = find_neighbor_count(game_board_markers, row, column)
                 game_board_markers[row][column] = neighbor_mine_count
     return game_board_markers
@@ -218,12 +214,12 @@ def draw_board_numbers(game_board_markers, window):
             location_x = LEFT_OFFSET + WIDTH_OF_IMAGES*column + WIDTH_OF_IMAGES//2
             location_y = TOP_OFFSET + HEIGHT_OF_IMAGES*row + HEIGHT_OF_IMAGES//2
 
-            if game_board_markers[row][column] == mine_id:
+            if game_board_markers[row][column] == MINE_CELL:
                 mine = Image(Point(location_x, location_y), 'mine.gif')
                 mine.draw(window)
             elif game_board_markers[row][column] == 0:
                 pass
-            elif game_board_markers[row][column] != mine_id:
+            elif game_board_markers[row][column] != MINE_CELL:
                 num = Text(Point(location_x, location_y), game_board_markers[row][column])
                 num.draw(window)
 
@@ -282,7 +278,7 @@ def flip_tile(game_board_markers, click_point, tiles, row, column):
     if the tile was already flipped.
     '''
     tiles[row][column].undraw()
-    #game_board_markers[row][column] = FLIPPED_SQUARE_ID
+    #game_board_markers[row][column] = EXPOSED_CELL
 
 
 def flip_mines(game_board_markers, tiles):
