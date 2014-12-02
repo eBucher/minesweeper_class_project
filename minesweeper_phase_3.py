@@ -405,20 +405,15 @@ def main():
     while game_status == 'playing':
         click_point = window.getMouse()
         if was_new_cell_clicked(game_board_markers, click_point) == True:
-            print('we are in a new cell')
             click_output = handle_click(game_board_markers, click_point, tiles)
             if click_output == 'mine':
-                print('Clicked a mine')
                 game_status = 'lose'
                 draw_game_message(window, window_width, 'Game Over')
             elif 0 <= click_output <= 9:
-                print('flipping a cell')
                 flipped_cells += click_output
         if flipped_cells == rows * columns - number_of_mines:
             game_status == 'win'
             draw_game_message(window, window_width, 'Winner')
-
-        print(flipped_cells)
 
         
         
