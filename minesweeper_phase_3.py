@@ -1,3 +1,9 @@
+'''
+CS115 Project 3 - Minesweeper
+Author - Erich Bucher
+'''
+
+
 from graphics import *
 import random
 
@@ -334,6 +340,7 @@ def handle_click(game_board_markers, click_point, tiles):
             game_board_markers[row][column] = EXPOSED_CELL
         elif 1 <= clicked_cell_id <= 8:
             flipped_cells = 1
+            game_board_markers[row][column] = EXPOSED_CELL
         return flipped_cells
     
         
