@@ -368,10 +368,13 @@ def draw_row_headers(game_board_markers, window):
         num.draw(window)
 
 
-def draw_game_message(window, window_width, message):
-    text = Text(Point(window_width / 2, TOP_OFFSET / 2), message)
-    text.setSize(16)
-    text.draw(window)
+def draw_face(window, window_width, status):
+    if status == 'win':
+        face = Image(Point(window_width/2, TOP_OFFSET / 2), SMILEY_IMAGE)
+        face.draw(window)
+    elif status == 'lose':
+        face = Image(Point(window_width/2, TOP_OFFSET / 2), LOSE_IMAGE)
+        face.draw(window)
         
 def main():
     difficulty = get_difficulty()
@@ -408,12 +411,13 @@ def main():
             click_output = handle_click(game_board_markers, click_point, tiles)
             if click_output == 'mine':
                 game_status = 'lose'
-                draw_game_message(window, window_width, 'Game Over')
+                draw_face(window, window_width, game_status)
             elif 0 <= click_output <= 9:
                 flipped_cells += click_output
         if flipped_cells == rows * columns - number_of_mines:
-            game_status == 'win'
-            draw_game_message(window, window_width, 'Winner')
+            game_status = 'win'
+            draw_face(window, window_width, game_status)
+        print(flipped_cells)
 
         
         
